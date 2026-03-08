@@ -15,12 +15,6 @@
 
 ---
 
-## ✨ GitHub Description (short)
-
-AI-powered Medical RAG chatbot that converts medical textbooks into embeddings using ChromaDB and generates accurate, human-friendly answers with TinyLlama. Built with Flask + modern glass UI for fast local inference.
-
----
-
 # 📌 Overview
 
 **MediAssist AI** is a smart medical assistant that:
@@ -85,6 +79,11 @@ Clean Human-Friendly Response
 - Smooth scrolling
 - Fully responsive
 - 2026 modern SaaS look
+
+# 📸 Sample Outputs
+
+### Chat Interface
+![Chat UI](assets/ui.png)
 
 ## 🚀 Performance
 - Lightweight model
