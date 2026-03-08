@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediBot - AI Medical Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}"/>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --accent: #8b5cf6;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .medical-chat-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            max-width: 900px;
+            width: 100%;
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .chat-header-medical {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chat-header-medical::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        }
+        
+        .medical-bot-avatar {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .medical-header-content {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+        
+        .medical-header-content h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .medical-header-content p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+        
+        .status-indicator-medical {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+        }
+        
+        .status-dot-medical {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .medical-messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            background: var(--light);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .medical-message {
+            display: flex;
+            gap: 12px;
+            max-width: 85%;
+            animation: messageSlide 0.3s ease-out;
+        }
+        
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .medical-message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        
+        .medical-message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        
+        .medical-message.user .medical-message-avatar {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+        }
+        
+        .medical-message.bot .medical-message-avatar {
+            background: linear-gradient(135deg, var(--secondary), #34d399);
+            color: white;
+        }
+        
+        .medical-message-content {
+            background: white;
+            padding: 16px 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            line-height: 1.5;
+        }
+        
+        .medical-message.user .medical-message-content {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+        
+        .medical-message.bot .medical-message-content {
+            border-bottom-left-radius: 6px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        
+        .medical-message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 6px;
+            display: block;
+        }
+        
+        .medical-typing-indicator {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            max-width: 85%;
+        }
+        
+        .medical-typing-bubble {
+            background: white;
+            padding: 16px 20px;
+            border-radius: 20px;
+            border-bottom-left-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray);
+        }
+        
+        .medical-typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .medical-typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--gray);
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite ease-in-out;
+        }
+        
+        .medical-typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .medical-typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes typingBounce {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        
+        .medical-input-container {
+            padding: 20px 24px;
+            background: white;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        
+        .medical-input-group {
+            background: var(--light);
+            border-radius: 16px;
+            padding: 4px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .medical-input-group:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .medical-chat-input {
+            border: none;
+            background: transparent;
+            padding: 12px 16px;
+            font-size: 1rem;
+            flex: 1;
+            outline: none;
+            color: var(--dark);
+        }
+        
+        .medical-chat-input::placeholder {
+            color: var(--gray);
+        }
+        
+        .medical-send-btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+        
+        .medical-send-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        .medical-send-btn:disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .quick-questions {
+            padding: 16px 24px;
+            background: rgba(248, 250, 252, 0.8);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+        }
+        
+        .quick-question-btn {
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--dark);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .quick-question-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+        
+        /* Scrollbar Styling */
+        .medical-messages-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .medical-messages-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .medical-messages-container::-webkit-scrollbar-thumb {
+            background: var(--gray);
+            border-radius: 3px;
+        }
+        
+        .medical-messages-container::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .medical-chat-container {
+                height: 90vh;
+                border-radius: 16px;
+            }
+            
+            .chat-header-medical {
+                padding: 16px;
+            }
+            
+            .medical-bot-avatar {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            .medical-header-content h1 {
+                font-size: 1.3rem;
+            }
+            
+            .medical-messages-container {
+                padding: 16px;
+            }
+            
+            .medical-message {
+                max-width: 90%;
+            }
+            
+            .quick-questions {
+                padding: 12px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="medical-chat-container">
+        <!-- Header -->
+        <div class="chat-header-medical">
+            <div class="medical-bot-avatar">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="medical-header-content">
+                <h1>MediBot AI Assistant</h1>
+                <p>Your personal medical information assistant</p>
+                <div class="status-indicator-medical">
+                    <div class="status-dot-medical"></div>
+                    <span>Online & Ready to Help</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Questions -->
+        <div class="quick-questions">
+            <button class="quick-question-btn" data-question="What is fever?">
+                <i class="fas fa-temperature-high"></i> What is fever?
+            </button>
+            <button class="quick-question-btn" data-question="Symptoms of headache">
+                <i class="fas fa-head-side-cough"></i> Headache symptoms
+            </button>
+            <button class="quick-question-btn" data-question="How to treat cold?">
+                <i class="fas fa-head-side-cough"></i> Treating cold
+            </button>
+            <button class="quick-question-btn" data-question="What is diabetes?">
+                <i class="fas fa-vial"></i> About diabetes
+            </button>
+            <button class="quick-question-btn" data-question="First aid for burns">
+                <i class="fas fa-burn"></i> Burn first aid
+            </button>
+        </div>
+
+        <!-- Messages Container -->
+        <div class="medical-messages-container" id="medicalMessages">
+            <!-- Welcome Message -->
+            <div class="medical-message bot">
+                <div class="medical-message-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="medical-message-content">
+                    👋 Hello! I'm <strong>MediBot</strong>, your AI medical assistant. I can help you understand symptoms, conditions, and general medical information.
+                    <br><br>
+                    💡 <strong>Try asking:</strong> "What are the symptoms of fever?" or "How to treat a headache?"
+                    <span class="medical-message-time" id="welcomeTime"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Typing Indicator (Hidden by default) -->
+        <div class="medical-typing-indicator" id="typingIndicator" style="display: none;">
+            <div class="medical-message-avatar">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="medical-typing-bubble">
+                <span>MediBot is thinking</span>
+                <div class="medical-typing-dots">
+                    <div class="medical-typing-dot"></div>
+                    <div class="medical-typing-dot"></div>
+                    <div class="medical-typing-dot"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="medical-input-container">
+            <div class="medical-input-group">
+                <input type="text" 
+                       class="medical-chat-input" 
+                       id="medicalInput" 
+                       placeholder="Ask about symptoms, conditions, or treatments..." 
+                       autocomplete="off">
+                <button class="medical-send-btn" id="medicalSendBtn">
+                    <i class="fas fa-paper-plane"></i>
+                    Send
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messagesContainer = document.getElementById('medicalMessages');
+            const inputField = document.getElementById('medicalInput');
+            const sendButton = document.getElementById('medicalSendBtn');
+            const typingIndicator = document.getElementById('typingIndicator');
+            const quickQuestionBtns = document.querySelectorAll('.quick-question-btn');
+            
+            // Set welcome message time
+            document.getElementById('welcomeTime').textContent = getCurrentTime();
+            
+            // Focus input field
+            inputField.focus();
+            
+            // Send message function
+            function sendMessage() {
+                const message = inputField.value.trim();
+                if (message === '') return;
+                
+                // Add user message
+                addMessage(message, 'user');
+                inputField.value = '';
+                
+                // Show typing indicator
+                showTypingIndicator();
+                
+                // Send to backend
+                fetch('/get', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'msg=' + encodeURIComponent(message)
+                })
+                .then(response => response.text())
+                .then(data => {
+                    hideTypingIndicator();
+                    addMessage(data, 'bot');
+                    scrollToBottom();
+                })
+                .catch(error => {
+                    hideTypingIndicator();
+                    addMessage('Sorry, I encountered an error. Please try again.', 'bot');
+                    console.error('Error:', error);
+                });
+            }
+            
+            // Add message to chat
+            function addMessage(content, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `medical-message ${sender}`;
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'medical-message-avatar';
+                avatar.innerHTML = sender === 'user' ? 
+                    '<i class="fas fa-user"></i>' : 
+                    '<i class="fas fa-robot"></i>';
+                
+                const messageContent = document.createElement('div');
+                messageContent.className = 'medical-message-content';
+                messageContent.innerHTML = content + 
+                    `<span class="medical-message-time">${getCurrentTime()}</span>`;
+                
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(messageContent);
+                messagesContainer.appendChild(messageDiv);
+                
+                scrollToBottom();
+            }
+            
+            // Show typing indicator
+            function showTypingIndicator() {
+                typingIndicator.style.display = 'flex';
+                scrollToBottom();
+            }
+            
+            // Hide typing indicator
+            function hideTypingIndicator() {
+                typingIndicator.style.display = 'none';
+            }
+            
+            // Scroll to bottom
+            function scrollToBottom() {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+            
+            // Get current time
+            function getCurrentTime() {
+                const now = new Date();
+                return now.getHours().toString().padStart(2, '0') + ':' + 
+                       now.getMinutes().toString().padStart(2, '0');
+            }
+            
+            // Event listeners
+            sendButton.addEventListener('click', sendMessage);
+            
+            inputField.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // Quick question buttons
+            quickQuestionBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const question = this.getAttribute('data-question');
+                    inputField.value = question;
+                    sendMessage();
+                });
+            });
+            
+            // Input field auto-resize and focus
+            inputField.addEventListener('input', function() {
+                sendButton.disabled = this.value.trim() === '';
+            });
+            
+            // Initial state
+            sendButton.disabled = true;
+        });
+    </script>
+</body>
+</html>

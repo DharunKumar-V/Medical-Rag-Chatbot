@@ -1,0 +1,354 @@
+/* ========================================================
+   🩺 Medical AI Chatbot – 2026 Modern Glass UI
+   Clean • Premium • Soft • ChatGPT style
+   ======================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --primary: #2563eb;
+    --accent: #7c3aed;
+    --success: #10b981;
+
+    --bg: #f1f5f9;
+    --card: rgba(255,255,255,0.7);
+    --border: rgba(0,0,0,0.08);
+    --text: #0f172a;
+    --muted: #64748b;
+
+    --radius: 22px;
+}
+
+/* ========================================================
+   Base
+   ======================================================== */
+
+* {
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+
+    /* soft gradient background */
+    background:
+        radial-gradient(circle at 10% 20%, #e0f2fe 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, #ede9fe 0%, transparent 40%),
+        var(--bg);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* ========================================================
+   Container (Glassmorphism)
+   ======================================================== */
+
+.medical-chat-container {
+    width: 100%;
+    max-width: 920px;
+    height: 88vh;
+
+    display: flex;
+    flex-direction: column;
+
+    border-radius: var(--radius);
+
+    background: var(--card);
+    backdrop-filter: blur(24px);
+
+    border: 1px solid rgba(255,255,255,0.4);
+
+    box-shadow:
+        0 40px 80px rgba(0,0,0,0.12),
+        inset 0 1px 0 rgba(255,255,255,0.6);
+
+    overflow: hidden;
+}
+
+
+/* ========================================================
+   Header
+   ======================================================== */
+
+.chat-header-medical {
+    padding: 22px 26px;
+
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+}
+
+.medical-bot-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 22px;
+
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(10px);
+}
+
+.medical-header-content h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.medical-header-content p {
+    margin: 4px 0 0;
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.status-indicator-medical {
+    margin-top: 6px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.status-dot-medical {
+    width: 8px;
+    height: 8px;
+    background: var(--success);
+    border-radius: 50%;
+    animation: pulse 1.8s infinite;
+}
+
+@keyframes pulse {
+    0% {opacity: 1}
+    50% {opacity: .4}
+    100% {opacity: 1}
+}
+
+
+/* ========================================================
+   Messages Area
+   ======================================================== */
+
+.medical-messages-container {
+    flex: 1;
+    overflow-y: auto;
+
+    padding: 26px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+
+    scroll-behavior: smooth;
+}
+
+
+/* ========================================================
+   Message Bubble
+   ======================================================== */
+
+.medical-message {
+    display: flex;
+    gap: 12px;
+    max-width: 80%;
+    animation: fadeUp .25s ease;
+}
+
+@keyframes fadeUp {
+    from {opacity:0; transform:translateY(8px)}
+    to {opacity:1; transform:translateY(0)}
+}
+
+.medical-message.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.medical-message-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 14px;
+    color: white;
+}
+
+.medical-message.user .medical-message-avatar {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+}
+
+.medical-message.bot .medical-message-avatar {
+    background: linear-gradient(135deg, #10b981, #34d399);
+}
+
+.medical-message-content {
+    padding: 14px 18px;
+    border-radius: 18px;
+
+    font-size: 0.95rem;
+    line-height: 1.6;
+
+    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+}
+
+/* user bubble */
+.medical-message.user .medical-message-content {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    border-bottom-right-radius: 6px;
+}
+
+/* bot bubble */
+.medical-message.bot .medical-message-content {
+    background: white;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-bottom-left-radius: 6px;
+}
+
+
+/* ========================================================
+   Typing Indicator
+   ======================================================== */
+
+.medical-typing-bubble {
+    background: white;
+    padding: 14px 18px;
+    border-radius: 18px;
+    border-bottom-left-radius: 6px;
+
+    display: flex;
+    gap: 6px;
+}
+
+.medical-typing-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--muted);
+    border-radius: 50%;
+    animation: bounce 1.3s infinite;
+}
+
+.medical-typing-dot:nth-child(2) { animation-delay: .15s }
+.medical-typing-dot:nth-child(3) { animation-delay: .3s }
+
+@keyframes bounce {
+    0%,80%,100%{transform:scale(.7)}
+    40%{transform:scale(1.2)}
+}
+
+
+/* ========================================================
+   Input Area (Sticky modern)
+   ======================================================== */
+
+.medical-input-container {
+    padding: 18px 22px;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border);
+}
+
+.medical-input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    background: white;
+    padding: 8px 12px;
+
+    border-radius: 16px;
+    border: 1px solid var(--border);
+
+    transition: .2s;
+}
+
+.medical-input-group:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+}
+
+.medical-chat-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: .95rem;
+    padding: 10px;
+}
+
+.medical-send-btn {
+    border: none;
+    cursor: pointer;
+
+    padding: 10px 18px;
+    border-radius: 12px;
+
+    font-weight: 500;
+    color: white;
+
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+
+    transition: .2s;
+}
+
+.medical-send-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(37,99,235,.3);
+}
+
+
+/* ========================================================
+   Quick Questions Pills
+   ======================================================== */
+
+.quick-questions {
+    padding: 12px 22px;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+}
+
+.quick-question-btn {
+    border-radius: 999px;
+    padding: 6px 14px;
+
+    border: 1px solid var(--border);
+    background: white;
+
+    font-size: .82rem;
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+.quick-question-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
+
+/* ========================================================
+   Mobile
+   ======================================================== */
+
+@media(max-width:768px){
+    .medical-chat-container{
+        height:100vh;
+        border-radius:0;
+    }
+}
