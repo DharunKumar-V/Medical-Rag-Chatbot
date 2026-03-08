@@ -1,6 +1,6 @@
-<<<<<<< HEAD
+
 # Medical-Chatbot
-=======
+
 # 🩺 MediAssist AI – Medical RAG Chatbot
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
